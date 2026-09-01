@@ -30,6 +30,44 @@ optimisation problem, and it has a right answer.
 
 ---
 
+## When you would actually reach for this
+
+**At 3am, with an account confirmed phished.** Someone has to say out loud which things get
+switched off. The reflex answers — disable the user, block every app she can reach — are
+respectively 2.4x and 13x more expensive than necessary in the bundled demo, and the second
+one *does not contain the incident at all*. Being able to put a number on that, in front of
+the person who owns the payroll run, is the whole point.
+
+**Before an incident, which is the better use.** Run it against your own tenant graph on a
+quiet Tuesday. The steps that keep appearing in the cut are your choke points — the app
+permission, the ownership, the group nobody remembers granting. Fix them and there is no
+3am. Step 5 of the demo is exactly that: removing `RoleManagement.ReadWrite.Directory` from
+a self-service portal is nowhere near the breached account, no "what can the victim reach"
+heuristic proposes it, and it is a permanent hardening rather than a containment step.
+
+**Tabletop exercises and IR retros.** "What would we have switched off?" becomes a
+computation with an answer instead of an argument. After a real incident, run the graph as
+it was and compare: was what you did minimal, and did it actually cut every path?
+
+**Purple team, to settle an argument.** The blue side says an app permission is harmless
+because nothing points at it. The cut disagrees, names it, and shows the S→T path that
+makes it load-bearing. A minimum cut is not an opinion.
+
+**Change advisory and cost conversations.** Every action carries a business-impact cost you
+set, so "contain this" stops being an unbounded ask. The plan comes with the price of the
+alternatives, including the upper bound on damage a responder can do by taking every
+available action.
+
+**Ownership chains nobody models.** Owning an app registration means you can add a
+credential to it and authenticate as its service principal, inheriting every permission it
+holds. That path is in almost no containment runbook and it is a first-class edge here.
+
+**When it is the wrong tool:** you need to *find* the attack paths (this consumes a graph,
+it does not discover one), you want automated response (the open-source build never calls
+Graph — it prints commands and you run them), or you do not yet have a graph you trust.
+That last one is the real prerequisite, and it is honest work: see
+[Limitations](#limitations).
+
 ## 30 seconds
 
 ```bash

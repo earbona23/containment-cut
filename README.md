@@ -30,6 +30,44 @@ optimisation problem, and it has a right answer.
 
 ---
 
+## When you would actually reach for this
+
+**At 3am, with an account confirmed phished.** Someone has to say out loud which things get
+switched off. The reflex answers — disable the user, block every app she can reach — are
+respectively 2.4x and 13x more expensive than necessary in the bundled demo, and the second
+one *does not contain the incident at all*. Being able to put a number on that, in front of
+the person who owns the payroll run, is the whole point.
+
+**Before an incident, which is the better use.** Run it against your own tenant graph on a
+quiet Tuesday. The steps that keep appearing in the cut are your choke points — the app
+permission, the ownership, the group nobody remembers granting. Fix them and there is no
+3am. Step 5 of the demo is exactly that: removing `RoleManagement.ReadWrite.Directory` from
+a self-service portal is nowhere near the breached account, no "what can the victim reach"
+heuristic proposes it, and it is a permanent hardening rather than a containment step.
+
+**Tabletop exercises and IR retros.** "What would we have switched off?" becomes a
+computation with an answer instead of an argument. After a real incident, run the graph as
+it was and compare: was what you did minimal, and did it actually cut every path?
+
+**Purple team, to settle an argument.** The blue side says an app permission is harmless
+because nothing points at it. The cut disagrees, names it, and shows the S→T path that
+makes it load-bearing. A minimum cut is not an opinion.
+
+**Change advisory and cost conversations.** Every action carries a business-impact cost you
+set, so "contain this" stops being an unbounded ask. The plan comes with the price of the
+alternatives, including the upper bound on damage a responder can do by taking every
+available action.
+
+**Ownership chains nobody models.** Owning an app registration means you can add a
+credential to it and authenticate as its service principal, inheriting every permission it
+holds. That path is in almost no containment runbook and it is a first-class edge here.
+
+**When it is the wrong tool:** you need to *find* the attack paths (this consumes a graph,
+it does not discover one), you want automated response (the open-source build never calls
+Graph — it prints commands and you run them), or you do not yet have a graph you trust.
+That last one is the real prerequisite, and it is honest work: see
+[Limitations](#limitations).
+
 ## 30 seconds
 
 ```bash
@@ -262,13 +300,13 @@ $ python3 scripts/benchmark.py
 
    users    nodes    edges  actions  breached   build s   solve s      cost  steps
      100      112      209      305         1     0.001     0.001        59      1
-     500      553     1099     1584         2     0.006     0.005        71      2
-    1000     1107     2255     3224         5     0.010     0.010       208      6
-    2500     2765     5613     8036        12     0.024     0.037       478     18
-    5000     5532    11325    16169        25     0.061     0.127      1269     45
-   10000    11063    22574    32262        50     0.143     0.803      2545     91
-   20000    22126    45135    64510       100     0.461     2.946      5399    191
-   40000    44251    90039   128789       200     0.638    14.172     11542    396
+     500      553     1099     1584         2     0.007     0.005        71      2
+    1000     1107     2255     3224         5     0.012     0.011       208      6
+    2500     2765     5613     8036        12     0.038     0.043       478     18
+    5000     5532    11325    16169        25     0.064     0.134      1269     45
+   10000    11063    22574    32262        50     0.162     0.740      2545     91
+   20000    22126    45135    64510       100     0.408     2.719      5399    191
+   40000    44251    90039   128789       200     0.731    15.585     11542    396
 ```
 
 Wall clock on one laptop, single-threaded, pure Python, no dependencies — absolute numbers
@@ -282,7 +320,7 @@ rather than by the graph.
 
 ```
 $ CONTAINMENT_CUT_REQUIRE_DIFFERENTIAL=1 pytest -q
-270 passed in 1.54s
+270 passed in 1.58s
 ```
 
 * **Exhaustive-search oracle.** `tests/conftest.py` computes the true optimum by
