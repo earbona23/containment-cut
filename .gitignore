@@ -1,0 +1,33 @@
+# The license SIGNING key must never be committed. Only the public key ships (embedded
+# in src/containment_cut/license/keys.py). The whole .secrets/ directory stays local.
+.secrets/
+*.pem
+!tests/fixtures/**/*.pem
+
+# A containment plan names real principals in a real tenant. Never commit one by accident.
+/out/
+containment-plan-*.json
+containment-plan-*.md
+*.tenant.json
+!src/containment_cut/demo/*.json
+!tests/fixtures/*.json
+
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.env
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

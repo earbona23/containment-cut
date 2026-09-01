@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      # The differential oracles (networkx for max-flow, cryptography for Ed25519) SKIP
+      # when their library is missing, and a skipped test reads exactly like a passing one
+      # on the summary line. This flag turns that skip into a hard failure, so the day the
+      # install stops working is the day CI says so.
+      - name: Tests (differential oracles required, not optional)
+        env:
+          CONTAINMENT_CUT_REQUIRE_DIFFERENTIAL: '1'
+        run: pytest -q
+
+  dogfood:
+    name: Dogfood — solve the demo tenant and check the certificate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -e .
+      - name: The demo must produce a proved-optimal plan (exit 0)
+        run: containment-cut demo --no-color
+      - name: The JSON output must claim optimality only when it is proved
+        run: |
+          containment-cut demo --format json > plan.json
+          python - <<'EOF'
+          import json, sys
+          plan = json.load(open("plan.json"))
+          assert plan["mode"] == "dry-run", plan["mode"]
+          assert plan["optimality_proved"] is True
+          assert plan["certificate"]["ok"] is True
+          assert all(plan["certificate"]["checks"].values()), plan["certificate"]
+          assert plan["total_cost"] == 185, plan["total_cost"]
+          print("dogfood ok: cost", plan["total_cost"], "steps", len(plan["steps"]))
+          EOF
+      - name: Execution must refuse, even when asked for it
+        run: |
+          set +e
+          containment-cut execute --graph src/containment_cut/demo/contoso.json \
+            --execute --i-understand-this-changes contoso 2> err.txt
+          code=$?
+          set -e
+          test "$code" != "0" || { echo "execute exited 0; it must refuse"; exit 1; }
+          grep -q "EXECUTION REFUSED" err.txt
+
+  mutation:
+    name: Mutation — the tests must kill every mutant
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -e ".[dev]"
+      - run: python scripts/mutation_test.py
+
+  benchmark:
+    name: Benchmark — scalability smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -e .
+      - run: python scripts/benchmark.py --max 5000
