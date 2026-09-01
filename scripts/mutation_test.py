@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import signal
 import subprocess
 import sys
@@ -173,6 +174,13 @@ MUTANTS: list[Mutant] = [
         "the tool says PROVED OPTIMAL when nothing was proved",
     ),
     Mutant(
+        "cli/failed-certificate-does-not-reach-the-exit-code",
+        SRC / "cli.py",
+        "    if plan.status == STATUS_CUT_FOUND and plan.certificate is not None and not plan.certificate.ok:\n        return 4",
+        "    if plan.status == STATUS_CUT_FOUND and plan.certificate is not None and not plan.certificate.ok:\n        return 0",
+        "a plan with a broken proof exits 0, so a pipeline gating on the exit code ships it",
+    ),
+    Mutant(
         "catalog/removable-false-is-ignored",
         SRC / "catalog.py",
         'if attrs.get("removable") is False:\n        return None',
@@ -180,6 +188,29 @@ MUTANTS: list[Mutant] = [
         "elements explicitly marked un-removable are proposed anyway",
     ),
 ]
+
+
+
+def purge_bytecode() -> int:
+    """Delete every __pycache__ under the project before measuring anything.
+
+    Restoring a mutant rewrites the file with content of the SAME LENGTH. CPython
+    invalidates a .pyc by comparing the source's (mtime, size), both of which can be
+    unchanged if the restore lands in the same clock second as the compile -- so the
+    interpreter reuses bytecode compiled from the MUTATED source. That is a false kill:
+    the defect is still executing while the tree on disk looks clean. Subprocesses run
+    with -B and PYTHONDONTWRITEBYTECODE so no new cache is created; this clears whatever
+    was there before.
+    """
+    removed = 0
+    for cache in ROOT.rglob("__pycache__"):
+        if ".venv" in cache.parts or ".git" in cache.parts:
+            continue
+        for item in sorted(cache.rglob("*"), reverse=True):
+            item.unlink() if item.is_file() else item.rmdir()
+        cache.rmdir()
+        removed += 1
+    return removed
 
 
 def digest(path: Path) -> str:
@@ -222,9 +253,10 @@ def run_suite() -> tuple[bool, str]:
     # reduced hypothesis budget, no subset. A mutation score measured against a weaker
     # suite than the one people run is a number about the wrong thing.
     env.setdefault("CONTAINMENT_CUT_REQUIRE_DIFFERENTIAL", "1")
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "pytest", "-x", "-q", "--no-header", "-p", "no:cacheprovider"],
+            [sys.executable, "-B", "-m", "pytest", "-x", "-q", "--no-header", "-p", "no:cacheprovider"],
             cwd=ROOT, capture_output=True, text=True, env=env, timeout=SUITE_TIMEOUT_S,
         )
     except subprocess.TimeoutExpired:
@@ -248,6 +280,9 @@ def main() -> int:
     signal.signal(signal.SIGINT, _restore_and_die)
     before = {m.path: digest(m.path) for m in mutants}
 
+    caches = purge_bytecode()
+    if caches:
+        print(f"Cleared {caches} stale __pycache__ director(ies).")
     print("Baseline: running the suite unmutated ...", flush=True)
     baseline_ok, how = run_suite()
     if not baseline_ok:

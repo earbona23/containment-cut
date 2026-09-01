@@ -74,7 +74,10 @@ def test_block() -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mutation-from", help="file with the output of scripts/mutation_test.py")
-    parser.add_argument("--bench-max", type=int, default=20000)
+    # 40k is the last row the Limitations section quotes by name. Lowering this default
+    # silently deletes the row the prose refers to, which is exactly the drift this
+    # generator exists to prevent.
+    parser.add_argument("--bench-max", type=int, default=40000)
     args = parser.parse_args()
 
     if args.mutation_from:

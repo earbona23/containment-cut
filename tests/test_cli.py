@@ -128,3 +128,35 @@ def test_writing_to_a_file(capsys, tmp_path):
 def test_every_format_produces_output(capsys, fmt):
     code, out, _ = run(capsys, "demo", "--format", fmt, "--no-color")
     assert code == 0 and out.strip()
+
+
+def test_a_failed_certificate_exits_four_and_says_so(capsys, monkeypatch):
+    """Exit 4 is a documented contract, and until now nothing exercised it.
+
+    The library-level behaviour — a broken certificate revoking the optimality claim — is
+    covered in test_plan_and_report.py. This asserts the CLI *wiring*: that the failure
+    reaches the process exit code and the operator's screen, rather than being computed
+    correctly and then dropped on the way out. A pipeline that gates on exit codes cannot
+    tell a bad proof from a good plan otherwise, which is the one confusion this tool
+    must never cause.
+    """
+    from containment_cut import cli as cli_module
+
+    real_solve = cli_module.solve
+
+    def solve_then_break_the_proof(*args, **kwargs):
+        plan = real_solve(*args, **kwargs)
+        assert plan.certificate is not None and plan.certificate.ok
+        plan.certificate.ok = False
+        plan.certificate.reasons = ["synthetic failure injected by the test"]
+        return plan
+
+    monkeypatch.setattr(cli_module, "solve", solve_then_break_the_proof)
+    code, out, _ = run(capsys, "demo", "--no-color")
+    assert code == 4
+    assert "OPTIMALITY NOT PROVED" in out
+    assert "synthetic failure injected by the test" in out
+    # And the claim must be revoked in the machine-readable output too, not just in prose.
+    code, out, _ = run(capsys, "demo", "--format", "json")
+    assert code == 4
+    assert json.loads(out)["optimality_proved"] is False

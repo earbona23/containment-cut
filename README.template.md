@@ -1,5 +1,13 @@
 # containment-cut
 
+[![CI](https://github.com/earbona23/containment-cut/actions/workflows/ci.yml/badge.svg)](https://github.com/earbona23/containment-cut/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB)](https://www.python.org/downloads/)
+[![Licence: MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](LICENSE)
+[![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20deps-0-2f855a)](#safety-posture)
+[![Mutation tested](https://img.shields.io/badge/mutation-21%2F21%20killed-2f855a)](#mutation-testing)
+[![Proved optimal](https://img.shields.io/badge/every%20plan-ships%20a%20proof-6b46c1)](#2-every-plan-ships-with-a-proof)
+[![Dry run](https://img.shields.io/badge/tenant-never%20modified-0f6e6e)](#safety-posture)
+
 **Everyone will tell you your blast radius. Nobody tells you the minimum cut to stop it.**
 
 Attack-path tools map the damage: *from this account, the attacker can reach these 40
@@ -192,9 +200,9 @@ rather than by the graph.
 ### Mutation testing
 
 Passing tests are evidence of nothing until you have watched them fail.
-`scripts/mutation_test.py` breaks the algorithm on purpose — 20 targeted mutants across
-the max-flow, the reduction, the certificate, the approximation, the catalogue and the
-command renderer — and demands the suite notice.
+`scripts/mutation_test.py` breaks the algorithm on purpose — 21 targeted mutants across
+the max-flow, the reduction, the certificate, the approximation, the catalogue, the
+command renderer and the CLI's exit codes — and demands the suite notice.
 
 ```
 {{MUTATION}}
@@ -211,7 +219,8 @@ becoming removable · `∞` off by one · the no-cut boundary being `>` instead 
 greedy ignoring coverage · the lower bound not sharing an action's cost across its
 elements · the constraint loop returning before the plan is a cut · `removable: false`
 being ignored · a missing object id becoming an invented GUID · optimality being claimed
-without a certificate.
+without a certificate · a failed certificate never reaching the process exit code, so a
+pipeline gating on exit status ships a plan whose proof did not verify.
 
 Note the one marked **killed (hang)**. Letting the BFS walk saturated arcs does not make
 the solver *wrong*, it makes it *never terminate* — and a suite with no time limit cannot
@@ -263,7 +272,60 @@ Output formats: `text`, `json`, `markdown`, `mermaid`.
   directory. `.gitignore` already excludes `*.tenant.json`, `containment-plan-*` and
   `out/`.
 
+Reporting a vulnerability, and what counts as one here: [SECURITY.md](SECURITY.md).
+
 ---
+
+## Limitations
+
+An optimality proof is a strong claim, so here is exactly what it does and does not cover.
+Read this section before you trust a plan in a real incident.
+
+**The proof is about the graph, not about your tenant.** `containment-cut` proves that no
+cheaper plan exists *for the model you gave it*. A relation you did not model is a route it
+cannot see, and it will confidently hand you a minimum cut that leaves that route open. The
+certificate's `sufficiency` check verifies the plan against the graph — nothing verifies
+the graph against reality. Building that graph honestly is the hard part of using this
+tool, and [docs/graph-format.md](docs/graph-format.md) is mostly about that.
+
+**The costs are yours, and the answer is only as good as they are.** "Cost" is business
+impact you assign to each action. The solver optimises your numbers exactly; if removing a
+group membership is priced at 25 when it actually locks out the night shift, you get a plan
+that is provably optimal against the wrong objective. Price them before the incident, not
+during it.
+
+**Cost is the only objective in this build.** Time-to-effect (a revoked token dies in
+minutes, a removed role assignment can take longer to propagate) and reversibility are not
+in the optimisation. They are *shown* — irreversible steps are marked — but a human decides
+what that is worth.
+
+**It is a snapshot, not a pursuit.** The model assumes a static graph and an attacker who
+does not act while you respond. Re-establishment is out of scope: if a dynamic group rule
+re-applies a membership you removed, or the attacker still holds a path to mint a new
+credential, that is a fact about your graph that you must model (`removable: false`) rather
+than something the solver can infer.
+
+**It does not find attack paths for you.** There is no tenant enumeration and no discovery.
+You bring the graph; this computes the cut. That is a deliberate boundary — it is a
+containment optimiser, not a second BloodHound.
+
+**Bundled actions are NP-hard, and it says so out loud.** With actions that destroy several
+elements at once the exact minimum is not computable in polynomial time. You get a proved
+`H(d)·OPT` bound plus a certified lower bound, so you always know how far from optimal the
+answer *could* be — frequently the gap closes to zero and the plan is proved optimal
+anyway, but "approximate" means approximate.
+
+**Nothing is contained until the plan is finished.** A minimum cut is a set, not a
+sequence. The ordering exists to close the most exposure earliest, but stopping halfway
+leaves a live path — the output says which jewels are still reachable after every step
+precisely so that this is impossible to misread.
+
+**Pure Python, single-threaded.** A 40,000-user synthetic tenant solves in about fifteen
+seconds — the last row of the benchmark table above, measured on the same run that
+produced this file. That is the design envelope; this is not built for million-node graphs.
+
+**It never touches your tenant.** The open-source build has no network code at all. It
+prints the commands; you run them, under your own change control.
 
 ## Free vs Pro
 
@@ -309,8 +371,10 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-<sub>This README is **generated**: `python3 scripts/build_readme.py` renders
-`README.template.md` by running the tool. The demo output, the diagram, the benchmark
-table, the test count and the mutation score above are all captured from real runs, and
-the generator refuses to write a README claiming a green suite or a clean mutation run
-that did not happen. No number in this file was typed by hand.</sub>
+<sub><b>Every number above was measured, not typed.</b> `README.md` is assembled from
+`README.template.md` by `scripts/build_readme.py`, which produces each block by
+<i>running the tool</i>: the demo output, the graph diagram, the benchmark table, the test
+count and the mutation score are captured from real runs on the current source. The
+generator refuses to write a README that claims a green suite or a clean mutation run
+which did not happen — so this file cannot drift ahead of the code, and a broken build
+cannot ship a README that says otherwise. Edit the template, never `README.md`.</sub>

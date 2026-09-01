@@ -15,3 +15,8 @@ First release.
   exhaustive search.
 * Terminal, JSON, Markdown and Mermaid output. Dry run always; `execute` refuses.
 * Offline Ed25519 license verification in pure Python; zero runtime dependencies.
+* 270 tests: an exhaustive-search oracle that shares nothing with the solver, property-based
+  cases over random tenants, differential checks against `networkx` and `pyca/cryptography`,
+  and a mutation harness of 21 targeted defects that must all be killed.
+* README is assembled by `scripts/build_readme.py`, which produces every block by running
+  the tool, so no number in it can drift ahead of the code.
