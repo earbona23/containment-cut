@@ -403,6 +403,15 @@ containment-cut license status
 
 ---
 
+## More tools like this
+
+Part of a small suite of dependency-free security tools I maintain. Each one runs
+offline, ships its own tests, and maps its detections to MITRE ATT&CK.
+
+- **[entraform](https://github.com/earbona23/entraform)** — catch risky Entra/Azure changes in a Terraform plan, before apply.
+- **[revtriage](https://github.com/earbona23/revtriage)** — offline malware triage: an explainable score and a STIX bundle from a suspicious file.
+- **[entra-tripwire](https://github.com/earbona23/entra-tripwire)** — decoy identities in Entra ID that fire the moment someone touches them.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
