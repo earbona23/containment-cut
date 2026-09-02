@@ -388,8 +388,7 @@ containment-cut license activate CONTAINMENTCUT-...
 containment-cut license status
 ```
 
-**Support the work:** [GitHub Sponsors](https://github.com/sponsors/earbona23) ·
-[Patreon](https://www.patreon.com/EduardArbona) · or buy a Pro license.
+**Support the work:** [GitHub Sponsors](https://github.com/sponsors/earbona23) · or buy a Pro license.
 
 ---
 
