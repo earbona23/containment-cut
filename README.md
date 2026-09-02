@@ -517,7 +517,7 @@ containment-cut license activate CONTAINMENTCUT-...
 containment-cut license status
 ```
 
-**Support the work:** [GitHub Sponsors](https://github.com/sponsors/earbona23) · or buy a Pro license.
+**Support the work:** [GitHub Sponsors](https://github.com/sponsors/earbona23) · or buy a Pro license (from US$29/mo per org — [pricing](docs/pro.md#pricing)).
 
 ---
 

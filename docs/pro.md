@@ -47,3 +47,15 @@ handling and no Graph call — there is a test that fails if any module imports 
 
 The free build prints the exact commands. Run them with your own change control. That is
 not a limitation; for most teams it is the correct workflow.
+## Pricing
+
+Per organisation, unlimited seats. The licence is a signed file, verified offline — no
+account, no phone-home.
+
+| | Monthly | Annual (two months free) |
+|---|:--:|:--:|
+| This tool, Pro | US$29 | US$290 |
+| All three tools (revtriage · EntraTripwire · containment-cut) | US$69 | US$690 |
+
+To buy, email **earbona@arrankago.com** with the name to put on the licence. You get the
+key by return email, usually the same day.
