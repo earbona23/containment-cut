@@ -1,5 +1,11 @@
 # Free vs Pro
 
+> **Pro is not on sale yet.** The live import, gated execution and multi-objective
+> features described below are not implemented in any build today: `check_gate` refuses
+> even when a valid licence is present, and `run` always raises. A licence bought now
+> would switch on nothing, so there is nothing to buy. This notice comes down the day
+> the features land — not before.
+
 The algorithm is free. All of it — the exact minimum cut, the certificate, the NP-hard
 approximation with its proved bound, every output format, the whole action catalogue.
 Nothing has been held back to make room for a paid tier, and nothing in the free build is
@@ -49,13 +55,19 @@ The free build prints the exact commands. Run them with your own change control.
 not a limitation; for most teams it is the correct workflow.
 ## Pricing
 
+**Not for sale yet — see the notice at the top of this page.** containment-cut Pro is
+not currently licensed to anyone, and no licence is issued for it, because the features
+a licence would unlock do not exist yet. The figures below are the intended list price
+once they do.
+
 Per organisation, unlimited seats. The licence is a signed file, verified offline — no
 account, no phone-home.
 
 | | Monthly | Annual (two months free) |
 |---|:--:|:--:|
 | This tool, Pro | US$29 | US$290 |
-| All three tools (revtriage · EntraTripwire · containment-cut) | US$69 | US$690 |
+| Bundle, once this tool ships (revtriage · EntraTripwire · containment-cut) | US$69 | US$690 |
 
-To buy, email **earbona@arrankago.com** with the name to put on the licence. You get the
+For revtriage and EntraTripwire, whose Pro features *are* implemented, email
+**earbona@arrankago.com** with the name to put on the licence. You get the
 key by return email, usually the same day.

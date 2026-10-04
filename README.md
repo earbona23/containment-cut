@@ -1,5 +1,15 @@
 # containment-cut
 
+> **Snapshot, not maintained.** This tool works and its tests pass, but it is not under
+> active development: I am not adding features and I do not review pull requests on a
+> schedule. Issues are welcome and I do read them — a reply may take a while. Last
+> substantive change: September 2026.
+>
+> Maintained instead: [revtriage](https://github.com/earbona23/revtriage),
+> [entra-tripwire](https://github.com/earbona23/entra-tripwire),
+> [entraform](https://github.com/earbona23/entraform) and
+> [vantage](https://github.com/earbona23/vantage).
+
 > 🔎 **Try this and the whole suite online — no install:** [consulting.arrankago.com](https://consulting.arrankago.com) · plus managed security and M365/Entra identity assessments for teams.
 
 [![CI](https://github.com/earbona23/containment-cut/actions/workflows/ci.yml/badge.svg)](https://github.com/earbona23/containment-cut/actions/workflows/ci.yml)
@@ -519,7 +529,9 @@ containment-cut license activate CONTAINMENTCUT-...
 containment-cut license status
 ```
 
-**Support the work:** [GitHub Sponsors](https://github.com/sponsors/earbona23) · or buy a Pro license (from US$29/mo per org — [pricing](docs/pro.md#pricing)).
+**Support the work:** [GitHub Sponsors](https://github.com/sponsors/earbona23). Pro for this
+tool is **not on sale yet** — the features a licence would unlock are not implemented
+yet, so there is nothing to buy. See [docs/pro.md](docs/pro.md).
 
 ---
 
