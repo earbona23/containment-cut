@@ -1,15 +1,5 @@
 # containment-cut
 
-> **Snapshot, not maintained.** This tool works and its tests pass, but it is not under
-> active development: I am not adding features and I do not review pull requests on a
-> schedule. Issues are welcome and I do read them — a reply may take a while. Last
-> substantive change: September 2026.
->
-> Maintained instead: [revtriage](https://github.com/earbona23/revtriage),
-> [entra-tripwire](https://github.com/earbona23/entra-tripwire),
-> [entraform](https://github.com/earbona23/entraform) and
-> [vantage](https://github.com/earbona23/vantage).
-
 > 🔎 **Try this and the whole suite online — no install:** [consulting.arrankago.com](https://consulting.arrankago.com) · plus managed security and M365/Entra identity assessments for teams.
 
 [![CI](https://github.com/earbona23/containment-cut/actions/workflows/ci.yml/badge.svg)](https://github.com/earbona23/containment-cut/actions/workflows/ci.yml)
@@ -21,6 +11,13 @@
 [![Dry run](https://img.shields.io/badge/tenant-never%20modified-0f6e6e)](#safety-posture)
 
 **Everyone will tell you your blast radius. Nobody tells you the minimum cut to stop it.**
+
+> **Status: snapshot.** Feature-complete for what it does and its tests pass; last
+> substantive change September 2026. I am not adding features here, and issues are welcome
+> and read. Under active maintenance instead: [revtriage](https://github.com/earbona23/revtriage),
+> [entra-tripwire](https://github.com/earbona23/entra-tripwire),
+> [entraform](https://github.com/earbona23/entraform) and
+> [vantage](https://github.com/earbona23/vantage).
 
 Attack-path tools map the damage: *from this account, the attacker can reach these 40
 things.* Useful — once. Then you are standing in a war room at 3am with a graph, a
