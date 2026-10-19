@@ -2,8 +2,10 @@
 
 ## Reporting
 
-Open a private security advisory on the repository. Please do not file a public issue for
-a vulnerability.
+Open a [private security advisory](https://github.com/earbona23/containment-cut/security/advisories/new)
+on the repository. Please do not file a public issue for a vulnerability.
+
+If you cannot use the advisory form, email **earbona@arrankago.com** instead.
 
 ## What this tool is, in security terms
 

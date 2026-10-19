@@ -9,7 +9,7 @@ description = "Minimum-cost containment cut: the cheapest set of actions that se
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
-authors = [{ name = "Eduard Arbona" }]
+authors = [{ name = "Eduard Arbona", email = "earbona@arrankago.com" }]
 keywords = ["security", "incident-response", "containment", "entra-id", "azure", "min-cut", "max-flow", "blue-team"]
 classifiers = [
   "Development Status :: 4 - Beta",
